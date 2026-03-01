@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.sansekai.my.id/api"}/freereels/detailAndAllEpisode?id=${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.sansekai.my.id/api"}/freereels/detailAndAllEpisode?key=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
