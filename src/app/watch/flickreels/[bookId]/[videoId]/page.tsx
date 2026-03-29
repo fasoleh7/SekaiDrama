@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -205,6 +207,7 @@ export default function FlickReelsWatchPage() {
               ref={videoRef}
               controls
               autoPlay
+              muted
               className={cn(
                 "w-full h-full object-contain max-h-[100dvh]",
                 (!currentEpisodeData || !videoReady) && "invisible"
@@ -222,6 +225,8 @@ export default function FlickReelsWatchPage() {
               // @ts-ignore
               referrerPolicy="no-referrer"
             />
+              <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
             {/* Loading overlay */}
             {(!currentEpisodeData || !videoReady) && (
               <div className="absolute inset-0 flex items-center justify-center z-20 flex-col gap-2">

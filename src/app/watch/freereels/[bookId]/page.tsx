@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -372,6 +374,7 @@ export default function FreeReelsWatchPage() {
                 ref={videoRef}
                 controls
                 autoPlay
+              muted
                 className="w-full h-full object-contain max-h-[100dvh]"
                 poster={drama.cover}
                 onEnded={handleVideoEnded}
@@ -395,6 +398,8 @@ export default function FreeReelsWatchPage() {
                   className="p-1.5 md:p-2 rounded-full text-white disabled:opacity-30 hover:bg-white/10 transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
+              <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
                 </button>
                 
                 <span className="text-white font-medium text-xs md:text-sm tabular-nums min-w-[60px] md:min-w-[80px] text-center">

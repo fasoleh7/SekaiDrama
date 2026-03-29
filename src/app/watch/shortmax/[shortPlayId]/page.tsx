@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useShortMaxAllEpisodes, useShortMaxDetail } from "@/hooks/useShortMax";
@@ -94,6 +96,10 @@ export default function ShortMaxWatchPage() {
     }
 
     const isHlsUrl = videoUrl.includes('.m3u8');
+    // Proxy m3u8 agar tidak kena CORS dari CDN
+    const proxiedUrl = isHlsUrl
+      ? `/api/proxy/video?url=${encodeURIComponent(videoUrl)}`
+      : videoUrl;
 
     if (isHlsUrl && Hls.isSupported()) {
       const hls = new Hls({
@@ -105,7 +111,7 @@ export default function ShortMaxWatchPage() {
       });
       hlsRef.current = hls;
 
-      hls.loadSource(videoUrl);
+      hls.loadSource(proxiedUrl);
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -120,7 +126,7 @@ export default function ShortMaxWatchPage() {
       });
     } else {
       // Native playback (Safari HLS or MP4)
-      video.src = videoUrl;
+      video.src = proxiedUrl;
       video.load();
       video.play().catch(() => {});
     }
@@ -229,10 +235,13 @@ export default function ShortMaxWatchPage() {
               controls
               playsInline
               autoPlay
+              muted
               crossOrigin="anonymous"
               {...({ disableRemotePlayback: true, referrerPolicy: "no-referrer" } as any)}
               onEnded={handleVideoEnded}
             />
+            <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
          </div>
 
          {/* Navigation Controls Overlay - Bottom */}

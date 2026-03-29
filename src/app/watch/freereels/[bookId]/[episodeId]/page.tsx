@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -152,18 +154,23 @@ export default function FreeReelsWatchPage() {
       <div className="flex-1 w-full h-full relative bg-black flex flex-col items-center justify-center">
          <div className="relative w-full h-full flex items-center justify-center">
             {currentVideoUrl ? (
-              <video
-                key={`${activeEpisodeId}-${videoQuality}`} // Force remount on episode or quality change
-                ref={videoRef}
-                src={useProxy ? `/api/proxy/video?url=${encodeURIComponent(currentVideoUrl)}` : currentVideoUrl}
-                controls
-                autoPlay
-                className="w-full h-full object-contain max-h-[100dvh]"
-                poster={drama.cover}
-                onEnded={handleVideoEnded}
-                // @ts-ignore
-                referrerPolicy="no-referrer"
-              />
+              <>
+                <video
+                  key={`${activeEpisodeId}-${videoQuality}`} // Force remount on episode or quality change
+                  ref={videoRef}
+                  src={useProxy ? `/api/proxy/video?url=${encodeURIComponent(currentVideoUrl)}` : currentVideoUrl}
+                  controls
+                  autoPlay
+              muted
+                  className="w-full h-full object-contain max-h-[100dvh]"
+                  poster={drama.cover}
+                  onEnded={handleVideoEnded}
+                  // @ts-ignore
+                  referrerPolicy="no-referrer"
+                />
+                <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
+              </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center z-20 flex-col gap-4">
                  <p className="text-white/60">URL Video tidak ditemukan</p>

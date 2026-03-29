@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNetShortDetail } from "@/hooks/useNetShort";
@@ -57,7 +59,11 @@ export default function NetShortWatchPage() {
   useEffect(() => {
     if (currentEpisodeData?.videoUrl && videoRef.current) {
         const video = videoRef.current;
-        const videoUrl = currentEpisodeData.videoUrl;
+        // Lewatkan proxy agar CDN tidak blokir browser request
+        const rawVideoUrl = currentEpisodeData.videoUrl;
+        const videoUrl = rawVideoUrl.includes('.m3u8')
+          ? `/api/proxy/video?url=${encodeURIComponent(rawVideoUrl)}`
+          : rawVideoUrl; // MP4 direct biasanya tidak perlu proxy
 
         addLog(`Loading video: ${videoUrl}`);
 
@@ -284,10 +290,13 @@ export default function NetShortWatchPage() {
               controls
               playsInline
               autoPlay
+              muted
               crossOrigin="anonymous"
               {...({ disableRemotePlayback: true, referrerPolicy: "no-referrer" } as any)}
               onEnded={handleVideoEnded}
             />
+              <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
          </div>
 
          {/* Navigation Controls Overlay - Bottom */}

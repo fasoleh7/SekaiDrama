@@ -85,12 +85,26 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        // ── Gesture overlay animations ──────────────────────────
+        fadeIn: {
+          "0%":   { opacity: "0", transform: "scale(0.85)" },
+          "20%":  { opacity: "1", transform: "scale(1)" },
+          "80%":  { opacity: "1", transform: "scale(1)" },
+          "100%": { opacity: "0", transform: "scale(0.95)" },
+        },
+        rippleFade: {
+          "0%":   { opacity: "0.3" },
+          "100%": { opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 2s infinite linear",
         pulse: "pulse 2s infinite",
+        // ── Gesture overlay animations ──────────────────────────
+        fadeIn:     "fadeIn 0.8s ease forwards",
+        rippleFade: "rippleFade 0.4s ease forwards",
       },
     },
   },

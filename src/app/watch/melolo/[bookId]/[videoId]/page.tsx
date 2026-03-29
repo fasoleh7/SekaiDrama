@@ -1,5 +1,7 @@
 
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -210,15 +212,20 @@ export default function MeloloWatchPage() {
                  We also use a ref to manually update if needed, though React src prop update usually suffices.
              */}
             {(selectedQuality) ? (
-              <video
-                ref={videoRef}
-                src={selectedQuality.url}
-                controls
-                autoPlay
-                playsInline
-                onEnded={handleVideoEnded}
-                className="w-full h-full object-contain max-h-[100dvh]"
-              />
+              <>
+                <video
+                  ref={videoRef}
+                  src={`/api/proxy/video?url=${encodeURIComponent(selectedQuality.url)}`}
+                  controls
+                  autoPlay
+              muted
+                  playsInline
+                  onEnded={handleVideoEnded}
+                  className="w-full h-full object-contain max-h-[100dvh]"
+                />
+                <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
+              </>
             ) : (
                 // Fallback while initializing first time quality
                 <div className="w-full h-full flex items-center justify-center text-white/50">

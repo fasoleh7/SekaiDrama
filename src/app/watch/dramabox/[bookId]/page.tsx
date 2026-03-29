@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
@@ -114,7 +116,7 @@ export default function DramaBoxWatchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableQualities.join(",")]);
 
-  // Get video URL with selected quality
+  // Get video URL dengan proxy agar CDN tidak blokir browser request
   const getVideoUrl = () => {
     if (!currentEpisodeData || !defaultCdn) return "";
 
@@ -123,7 +125,11 @@ export default function DramaBoxWatchPage() {
       defaultCdn.videoPathList.find((v) => v.isDefault === 1) ||
       defaultCdn.videoPathList[0];
 
-    return videoPath?.videoPath || "";
+    const rawUrl = videoPath?.videoPath || "";
+    if (!rawUrl) return "";
+
+    // Selalu lewatkan proxy agar CDN dramabox tidak blokir request browser
+    return `/api/proxy/video?url=${encodeURIComponent(rawUrl)}&referer=${encodeURIComponent("https://www.dramaboxdb.com/")}`;
   };
 
   const handleVideoEnded = () => {
@@ -303,15 +309,20 @@ export default function DramaBoxWatchPage() {
          {/* Video Element Wrapper */}
          <div className="relative w-full h-full flex items-center justify-center">
             {currentEpisodeData ? (
-              <video
-                ref={videoRef}
-                src={getVideoUrl()}
-                controls
-                autoPlay
-                onEnded={handleVideoEnded}
-                className="w-full h-full object-contain max-h-[100dvh]"
-                poster={currentEpisodeData.chapterImg}
-              />
+              <>
+                <video
+                  ref={videoRef}
+                  src={getVideoUrl()}
+                  controls
+                  autoPlay
+              muted
+                  onEnded={handleVideoEnded}
+                  className="w-full h-full object-contain max-h-[100dvh]"
+                  poster={currentEpisodeData.chapterImg}
+                />
+                <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
+              </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center z-20">
                 <Loader2 className="w-10 h-10 text-primary animate-spin" />

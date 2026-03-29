@@ -1,4 +1,6 @@
 "use client";
+import { PlayerGestureOverlay } from "@/components/player/PlayerGestureOverlay";
+import { UnmuteButton } from "@/components/player/UnmuteButton";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -140,6 +142,11 @@ export default function ReelShortWatchPage() {
 
     const video = videoRef.current;
 
+    // Lewatkan proxy untuk m3u8 agar tidak kena CORS
+    const proxiedUrl = videoUrl.includes('.m3u8')
+      ? `/api/proxy/video?url=${encodeURIComponent(videoUrl)}`
+      : videoUrl;
+
     if (Hls.isSupported()) {
       if (hlsRef.current) {
         hlsRef.current.destroy();
@@ -147,13 +154,13 @@ export default function ReelShortWatchPage() {
       
       const hls = new Hls();
       hlsRef.current = hls;
-      hls.loadSource(videoUrl);
+      hls.loadSource(proxiedUrl);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         video.play().catch(() => {});
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = videoUrl;
+      video.src = proxiedUrl;
       video.play().catch(() => {});
     }
   }, []);
@@ -296,8 +303,11 @@ export default function ReelShortWatchPage() {
               controls
               playsInline
               autoPlay
+              muted
               onEnded={handleVideoEnded}
             />
+              <PlayerGestureOverlay videoRef={videoRef} />
+            <UnmuteButton videoRef={videoRef} />
          </div>
 
          {/* Navigation Controls Overlay - Bottom */}
